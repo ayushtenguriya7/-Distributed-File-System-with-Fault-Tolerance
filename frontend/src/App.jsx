@@ -98,6 +98,17 @@ function App() {
       setMessage(error.message);
     }
   }
+  function openFile(fileId, filename) {
+    const openUrl = `${API_BASE_URL}/files/${fileId}/open`;
+    const openedTab = window.open(openUrl, "_blank", "noopener,noreferrer");
+
+    if (!openedTab) {
+      setMessage("Popup blocked. Please allow popups for this site.");
+      return;
+    }
+
+    setMessage(`Opened ${filename}`);
+  }
 
   async function deleteFile(fileId) {
     try {
@@ -342,6 +353,13 @@ function App() {
                           </td>
                           <td className="px-4 py-4 align-top">
                             <div className="flex flex-wrap gap-2">
+                              <button
+                                type="button"
+                                onClick={() => openFile(file.id, file.filename)}
+                                className="rounded-xl bg-emerald-500/15 px-3 py-2 text-emerald-200 transition hover:bg-emerald-500/25"
+                              >
+                                Open
+                              </button>
                               <button
                                 type="button"
                                 onClick={() => downloadFile(file.id, file.filename)}

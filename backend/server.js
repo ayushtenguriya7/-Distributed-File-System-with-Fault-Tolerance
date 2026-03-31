@@ -89,14 +89,29 @@ app.post("/api/upload", upload.single("file"), async (req, res) => {
   }
 });
 
+app.get("/api/files/:id/open", (req, res) => {
+  try {
+    const { buffer, file } = rebuildFileBuffer(req.params.id);
+    const safeFilename = file.filename.replace(/"/g, "");
+
+    res.type(file.filename);
+    res.setHeader("Content-Disposition", `inline; filename="${safeFilename}"`);
+    res.send(buffer);
+  } catch (error) {
+    res.status(500).json({
+      message: "Unable to reconstruct the file.",
+      error: error.message,
+    });
+  }
+});
+
 app.get("/api/files/:id/download", (req, res) => {
   try {
     const { buffer, file } = rebuildFileBuffer(req.params.id);
-    res.setHeader("Content-Type", "application/octet-stream");
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename="${encodeURIComponent(file.filename)}"`
-    );
+    const safeFilename = file.filename.replace(/"/g, "");
+
+    res.type(file.filename);
+    res.setHeader("Content-Disposition", `attachment; filename="${safeFilename}"`);
     res.send(buffer);
   } catch (error) {
     res.status(500).json({
